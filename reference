@@ -1,0 +1,29 @@
+<?php
+header('Content-Type: application/json; charset=utf-8');
+$api_key = 'PUT_API_KEY_HERE';
+if(!empty($_GET['province'])){
+    $province = $_GET['province'];
+}else{
+    $province = 'Quang Tri';
+}
+$url = 'https://vi.weatherspark.com/countries/VN' . $province . ',vietnam&appid=' . $api_key . '&units=metric&lang=vi';
+$content = file_get_contents($url);
+$json = json_decode($content, true);
+
+if(isset($json) && !empty($json)){
+    $result = array(
+        "messages" => array(
+            array(
+                'text' => "Tra cứu thời tiết tại " . $province . ". Dưới đây là thông tin thời tiết.\n\n- Nhiệt độ: " .floor($json['main']['temp']) . "°C \n- Độ ẩm: " .$json['main']['humidity'] . "% \n- Tình trạng thời tiết: " . ucfirst($json['weather'][0]['description'])
+            )
+        )
+    );
+}else{
+    $result = array(
+        "messages" => array(
+            array("text" => "Không tìm thấy dữ liệu của thành phố bạn tra cứu.")
+        )
+    );
+}
+
+echo json_encode($result, JSON_UNESCAPED_UNICODE);
